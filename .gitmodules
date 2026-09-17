@@ -1,6 +1,7 @@
 [submodule "Loop"]
 	path = Loop
-	url = https://github.com/LoopKit/Loop.git
+	url = https://github.com/msreyesUS/Loop.git
+	branch = ui-redesign
 [submodule "LoopKit"]
 	path = LoopKit
 	url = https://github.com/LoopKit/LoopKit.git
@@ -39,7 +40,8 @@
 	url = https://github.com/LoopKit/LoopSupport
 [submodule "G7SensorKit"]
 	path = G7SensorKit
-	url = https://github.com/LoopKit/G7SensorKit.git
+	url = https://github.com/msreyesUS/G7SensorKit.git
+	branch = ui-redesign
 [submodule "TidepoolService"]
 	path = TidepoolService
 	url = https://github.com/LoopKit/TidepoolService.git
@@ -54,7 +56,8 @@
 	url = https://github.com/LoopKit/LibreTransmitter.git
 [submodule "OmnipodKit"]
 	path = OmnipodKit
-	url = https://github.com/loopandlearn/OmnipodKit
+	url = https://github.com/msreyesUS/OmnipodKit.git
+	branch = ui-redesign
 [submodule "MedtrumKit"]
 	path = MedtrumKit
 	url = https://github.com/jbr7rr/MedtrumKit
