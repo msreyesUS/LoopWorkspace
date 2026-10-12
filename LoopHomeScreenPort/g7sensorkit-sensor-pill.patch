@@ -1,0 +1,54 @@
+diff --git a/G7SensorKitUI/G7CGMManager/G7CGMManager+UI.swift b/G7SensorKitUI/G7CGMManager/G7CGMManager+UI.swift
+index fe8fa5d..e6a9464 100644
+--- a/G7SensorKitUI/G7CGMManager/G7CGMManager+UI.swift
++++ b/G7SensorKitUI/G7CGMManager/G7CGMManager+UI.swift
+@@ -78,7 +78,7 @@ extension G7CGMManager: CGMManagerUI {
+             return G7DeviceStatusHighlight(
+                 localizedMessage: LocalizedString("Sensor\nIssue", comment: "G7 Status highlight text for sensor error"),
+                 imageName: "exclamationmark.circle.fill",
+-                state: .warning)
++                state: .critical)
+         }
+ 
+         if lifecycleState == .warmup {
+@@ -87,6 +87,20 @@ extension G7CGMManager: CGMManagerUI {
+                 imageName: "clock",
+                 state: .normalCGM)
+         }
++
++        // When everything is normal, show the time remaining until sensor expiration.
++        // Units zero out rather than drop as time drains, e.g. "0 days\n0 hrs 52 min",
++        // matching the pump pill.
++        if lifecycleState == .ok, let expiration = sensorExpiresAt, expiration.timeIntervalSinceNow > 0 {
++            let totalMinutes = Int(expiration.timeIntervalSinceNow / 60)
++            let days = totalMinutes / (24 * 60)
++            let hours = (totalMinutes % (24 * 60)) / 60
++            let minutes = totalMinutes % 60
++            return G7DeviceStatusHighlight(
++                localizedMessage: "\(days) days\n\(hours) hrs \(minutes) min",
++                imageName: "sensor.tag.radiowaves.forward",
++                state: .normalCGM)
++        }
+         return nil
+     }
+ 
+@@ -102,16 +116,16 @@ extension G7CGMManager: CGMManagerUI {
+     public var cgmLifecycleProgress: DeviceLifecycleProgress? {
+         switch lifecycleState {
+         case .ok:
+-            // show remaining lifetime, if < 24 hours
+             guard let expiration = sensorExpiresAt else {
+                 return nil
+             }
+             let remaining = max(0, expiration.timeIntervalSinceNow)
+ 
++            // The bar length represents time remaining: long when fresh, a sliver near expiry
+             if remaining < .hours(24) {
+-                return G7LifecycleProgress(percentComplete: 1-(remaining/lifetime), progressState: .warning)
++                return G7LifecycleProgress(percentComplete: remaining/lifetime, progressState: .warning)
+             }
+-            return nil
++            return G7LifecycleProgress(percentComplete: remaining/lifetime, progressState: .normalCGM)
+         case .gracePeriod:
+             guard let endTime = sensorEndsAt else {
+                 return nil

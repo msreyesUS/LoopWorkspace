@@ -1,0 +1,73 @@
+d6606dec Fix bolus card bouncing the action buttons; drop extra carb Continue
+39208e58 Adopt UIScene lifecycle for iOS 27; status screen and bolus UI refinements
+8ca639df Show remaining days/hrs/min instead of expiration date in pump pill
+141ba509 Move pod expiration text closer to the pod icon
+404a9b87 Expiration date format: MMM d, yyyy
+467b8ddc Nudge pod expiration text toward the pod graphic
+007f4304 Fade status rows in place, symmetric top card padding, yyyy-MMM-dd expiration format
+d50ccb74 Equal top-card halves; both devices show expiration as date over time
+119c351a Mirrored top-card anchoring, button haptics, fading status rows
+b775752d Fix pod expiration after remaining-fraction flip; bar and icon padding
+e145fc17 Lighter borders with soft shadow, compact layout, unified top card
+b75e693d Grey ring in all states; white value and unit on the red low disc
+473ef678 Pill text weight matches the card titles (semibold)
+5708ce7c Remove the Glucose title from the ring; nudge the unit line down
+ecd4dffd Glucose value 20 percent smaller (80pt -> 64pt)
+c372312c Soften the coin's drop shadow
+399bf557 Grey gradient ring with drop shadow; smaller value; hairlines removed
+94b6cb26 Dexcom-style state coloring: white coin in range, flooded yellow/red out
+c41a2512 Cut the trend arrow out of the bulge as negative space
+1ceab9ef Slate glucose value; ring outline flattened to the card border appearance
+040e5d86 Arrow base contours with the ring
+c909fbd1 Card-border outline, thicker ring, uniform margin around the arrow
+f1e93df9 Smooth tangent blend into the bulge; solid arrow; slate silhouette outline
+e184fae1 Hollow, doubled trend arrow in a larger bulge
+826daac6 Ring contour flows into the trend bulge, droplet-style
+92a873da Bold slate trend arrow on the glucose ring
+33c2586d Reapply "Dexcom-style trend arrow riding the glucose ring"
+a4e550a8 Soften card borders by 20 percent
+8c902e67 Hairline borders on all card surfaces
+4b534e10 Shorter primary buttons; pressed-in active Preset state
+23b3de53 Nudge sensor icon in from the pill edge and enlarge slightly
+766d36ff Nudge pod expiration text slightly trailing for optical centering
+be5a085a Revert "Dexcom-style trend arrow riding the glucose ring"
+e500c202 Dexcom-style trend arrow riding the glucose ring
+5fb8ff0c Revert "Center pod expiration on the whole pill"
+d05a7af0 Center pod expiration on the whole pill
+1d860e8a Sensor pill adopts the pump's info accent color
+1869781b Match pill text styles, center within available space, mirrored sensor bar
+40672537 Bigger pill fonts; center pod expiration in its space
+6300b13b Pod pill: expiration instead of basal dial, preset-blue pod, lighter pill fonts
+ace905b3 Ring colors against the in-range band, computed Loop-side
+18264152 Preset button purple accent while a preset is active; reword sensor fallback
+1cc5d6f7 Range values on the chart's right edge
+412b2df9 Stats card captions: carb entry time, basal change time, values-only bolus
+3a1aea19 Fixed chart scale and conventional in-range band
+47be33b3 Device feedback fixes: drop delta, center pill content, symmetric hero, bolus insets
+3a6314f0 More vibrant range ring
+b4202aa7 Distinct primary button colors; remove button gradients
+35e23840 Adopt 9-color palette for buttons and semantic colors
+4a99edc9 Bigger ring padding; CGM pill shows sensor state instead of duplicate glucose
+277db903 Lighten background further; bottom bar corner radius matches cards
+2238b882 Lighten background gradient
+bd658554 Second status row for active override, card-style status cells, centered ring
+93c038cc Translucent HUD status pills; cards and bottom bar to 62% opacity
+00850f46 Clear HUD bar background, unify bottom bar with card material, 50% opacity
+69d5a18c More card transparency, deeper blue-to-green background, thicker range ring
+0372d2dd Clear glass bottom bar, green pre-meal toggle, history-only chart, gradient primaries
+698f571d Glass capsule bottom bar, neutral Glucose title, range-colored ring
+164d4205 Match reference: blue-green background, plain Glucose title, uniform bottom items
+73ae4938 Translucent cards, colored secondary buttons, title in ring, last bolus into IOB card
+6d77c5d0 Card-based status screen per reference design
+fdecd375 Full-screen breathing gradient, remove hero ring and sparkline, fix Settings icon
+0b4e060c Tab-bar glass pill for secondary actions, clear-glass primaries, centered 92pt glucose
+e2708d2e Larger glucose value, trend arrow below reading, centered flat sparkline
+453b44fa White button icons, matching corners, glucose sparkline, gradient tint
+bc0315bb Move HUD above hero, enlarge action buttons, bottom-align actions, Liquid Glass
+4ac44633 Fix squashed status screen layout; placeholder glucose when no reading
+726fb5ce Tint hero cell background by glucose range
+d7cfd1dc Replace toolbar with action button cells
+c0b1d949 Add last bolus row below the stats row
+76600cd2 Add three-up stats row for IOB, COB, and net basal
+ae4514c7 Add hero cell with large loop ring and glucose display
+bd31fa5e Remove charts section from status screen
