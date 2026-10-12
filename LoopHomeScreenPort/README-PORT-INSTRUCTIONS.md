@@ -1,9 +1,9 @@
 # Port Marco's Loop home-screen redesign onto Loop 3.14.9
 
 Created 2026-10-12 from the 3.14.2 workspace (`Loop-260809-1949`). This folder is
-self-contained: it holds the exact patches of every custom change plus the design
-spec, so the port can be done even if the old workspace is gone. It is also
-committed to `https://github.com/msreyesUS/LoopWorkspace` (branch `main`, folder
+self-contained: it holds patches of every custom change plus the design spec, so
+the port can be done even if the old workspace is gone. It is also committed to
+`https://github.com/msreyesUS/LoopWorkspace` (branch `main`, folder
 `LoopHomeScreenPort/`).
 
 ## How to use this (Marco)
@@ -11,10 +11,7 @@ committed to `https://github.com/msreyesUS/LoopWorkspace` (branch `main`, folder
 1. Build stock Loop 3.14.9 with the Loop build script (Build Loop, main branch) and
    run it on the phone first. Ideally run it stock through a pod change to confirm
    the fault 203 fix before customizing.
-   - If the stock build crashes at launch on iOS 27 with "UIScene life cycle is
-     required", that is expected with Xcode 27; the port below includes the fix.
-2. Copy this whole `LoopHomeScreenPort` folder into the NEW workspace folder (or
-   anywhere; just adjust the path below).
+2. Copy this whole `LoopHomeScreenPort` folder into the NEW workspace folder.
 3. Open Claude Code inside the NEW workspace folder and paste:
 
    > Read `LoopHomeScreenPort/README-PORT-INSTRUCTIONS.md` and carry out the
@@ -25,45 +22,76 @@ committed to `https://github.com/msreyesUS/LoopWorkspace` (branch `main`, folder
 
 ## Instructions for Claude
 
-You are in a fresh LoopWorkspace at Loop 3.14.9 (workspace tag v3.14.9; the Loop
-submodule should be at commit c30b5c89). Re-apply the home-screen redesign.
+You are in a fresh LoopWorkspace at Loop 3.14.9 (workspace tag v3.14.9). Re-apply
+the home-screen redesign. Confirm first: `git -C Loop rev-parse HEAD` should start
+with `c30b5c89`. If it does not, see "If the Loop commit differs" below.
 
-### Sources, in order of preference
+### Step 1: Loop (the status screen, bolus and carb screens)
 
-1. **Git forks (GitHub user msreyesUS)** — complete history:
-   - `https://github.com/msreyesUS/Loop` branch `ui-redesign`, head `d6606dec`.
-     Redesign base is `1f71ec4f` (LoopKit `dev` at 3.14.2).
-   - `https://github.com/msreyesUS/G7SensorKit` branch `ui-redesign`, head `b3b19ae`,
-     base `890e607`.
-   - `https://github.com/msreyesUS/OmnipodKit` branch `ui-redesign`, head `9572ca3`,
-     base `d68699c`.
-2. **Patch files in this folder** — identical content, no network needed:
-   - `loop-ui-redesign.patch` — `git diff 1f71ec4f d6606dec` of the Loop repo
-     (33 files, +2733/-446). Apply in the `Loop` submodule with
-     `git apply --3way --index loop-ui-redesign.patch`.
-   - `g7sensorkit-sensor-pill.patch` — one file, `G7CGMManager+UI.swift`.
-   - `omnipodkit-pod-lifecycle-bar.patch` — ten lines in `OmniPumpManager.swift`.
-   - `loop-commit-history.txt` — the commit list, for context on intent.
+Primary source: **`loop-ui-redesign-REBASED-on-3.14.9.patch`** in this folder. It
+was produced by three-way merging the redesign onto `c30b5c89` with all conflicts
+resolved, and verified with `git apply --check` against a pristine `c30b5c89`.
 
-### Expected merge behaviour
+    cd Loop
+    git switch -c ui-redesign-3.14.9
+    git apply --index ../LoopHomeScreenPort/loop-ui-redesign-REBASED-on-3.14.9.patch
+    git commit -m "Status screen redesign (ported from 3.14.2 workspace)"
 
-- **Loop:** upstream made no content changes to `StatusTableViewController.swift`,
-  `BolusEntryView.swift`, or `CarbEntryView.swift` between `1f71ec4f` and
-  3.14.9, so the patch should land nearly clean. Expect small conflicts only in
-  `Loop.xcodeproj/project.pbxproj` (SceneDelegate.swift must be added to the Loop
-  target), `Loop/Info.plist`, and the two `Localizable.xcstrings` files (keep both
-  sides' strings). `FavoriteFoodDetailView.swift`: take upstream's version.
-- **G7SensorKit:** upstream also edited the same file (11 commits since base).
-  Resolve preserving Marco's display behaviour (see spec).
-- **OmnipodKit:** upstream rewrote `OmniPumpManager.swift` for connect-on-demand.
-  Do NOT merge; re-implement the ten-line lifecycle-bar behaviour by hand (spec
-  below). Do not touch any pod communication code. This is the whole reason for
-  the upgrade.
-- **UIScene lifecycle:** keep Marco's `SceneDelegate.swift` + Info.plist
-  `UIApplicationSceneManifest` + AppDelegate deferral. Upstream 3.14.9 has not
-  adopted scenes and the iOS 27 SDK kills legacy-lifecycle apps at launch.
+Resolutions already baked into that patch (so you know what NOT to redo):
 
-### Design spec (what the result must look like)
+- **UIScene lifecycle:** upstream 3.14.9 adopted it itself (`SceneDelegate.swift` is
+  the `WindowProvider`, AppDelegate defers launch to the scene). Marco's own scene
+  adoption was dropped; upstream's `AppDelegate.swift`, `SceneDelegate.swift`,
+  `Info.plist` scene manifest and `project.pbxproj` are kept verbatim.
+- **StatusTableViewController.swift:** upstream's only changes since the redesign
+  base were four commits reworking the bottom toolbar (Liquid Glass toolbar, real
+  bar button items, iOS 27 spacing). The redesign deletes that toolbar in favour
+  of the action-button row, so the redesign's file is taken whole. Upstream also
+  independently switched the bolus sheet to a titled "Cancel" button; both agree.
+- **Liquid Glass:** upstream removed `UIDesignRequiresCompatibility` (glass ON
+  app-wide). Marco's current app has it `true` (glass OFF app-wide), so the patch
+  re-adds it. This is a taste decision: if Marco wants system glass on navigation
+  bars and sheets, delete that key; the action buttons stay flat either way.
+- `FavoriteFoodDetailView.swift` keeps Marco's `@State` declaration (an iOS 27 SDK
+  compile fix); string catalogs merge both sides.
+
+Fallback source if the rebased patch somehow fails: `loop-ui-redesign.patch` is the
+raw `git diff 1f71ec4f d6606dec` (33 files) and
+`https://github.com/msreyesUS/Loop` branch `ui-redesign` (head `d6606dec`) has the
+full history (`loop-commit-history.txt` lists it). Apply with `git apply --3way` and
+resolve using the policy above.
+
+### Step 2: G7SensorKit (sensor pill)
+
+`g7sensorkit-sensor-pill.patch` is one file, `G7CGMManager+UI.swift` (base
+`890e607`, head `b3b19ae` on `https://github.com/msreyesUS/G7SensorKit` branch
+`ui-redesign`). Upstream also edited that file (11 commits since base), so expect
+a small conflict; resolve preserving Marco's display behaviour (spec below).
+
+### Step 3: OmnipodKit (pod lifecycle bar)
+
+`omnipodkit-pod-lifecycle-bar.patch` is ten lines in `OmniPumpManager.swift` (base
+`d68699c`, head `9572ca3`). Upstream rewrote that file for connect-on-demand. Do
+NOT merge; re-implement the behaviour by hand (spec below). **Do not touch any pod
+communication code.** The pod-fault fix is the whole reason for this upgrade.
+
+### Step 4: Build, verify, publish
+
+Build and run on the iPhone 18 Pro Max. Verify every item in the spec, then enact
+a small bolus and a suspend to confirm the status cards fade without moving the
+buttons. Push each repo to a new branch `ui-redesign-3.14.9` on the msreyesUS
+forks, point `.gitmodules` at those branches, commit the submodule pointers, and
+push the workspace to `msreyesUS/LoopWorkspace`.
+
+### If the Loop commit differs
+
+If the new workspace pins a later Loop commit than `c30b5c89`, try the rebased
+patch with `git apply --3way` anyway; it is far closer than the raw one. Resolve
+any new conflicts with the policy above: scene/launch files and project file from
+upstream, status-screen file from the redesign unless upstream added a non-toolbar
+feature there, in which case merge it in.
+
+## Design spec (what the result must look like)
 
 Status screen, top to bottom, on a soft blue-to-green vertical gradient with
 translucent rounded cards (62% system background, hairline border):
@@ -100,7 +128,8 @@ translucent rounded cards (62% system background, hairline border):
    exact center; minimum height 64pt; table has `delaysContentTouches = false`.
    Medium haptic on tap. "More" presents a sheet with full-width Pre-Meal,
    Suspend, and Preset buttons (leading icon, 17pt), with a pressed-in "active"
-   style (tinted border, light fill) when a preset is on.
+   style (tinted border, light fill) when a preset is on. The navigation toolbar
+   is gone entirely.
 
 Bolus modal: titled "Cancel" bar button (not the system X), "Bolus Summary"
 card first with the forecast chart below it, list top margin 4pt and 10pt
@@ -119,7 +148,7 @@ OmnipodKit: pod lifecycle bar shows progress throughout normal pod life; it
 depletes (remaining fraction) and switches to the warning state only in the
 final four hours; otherwise it stays the normal pump color near end of life.
 
-### Known pitfalls from the original work
+## Known pitfalls from the original work
 
 - Setting `titleAlignment = .center` on a `UIButton.Configuration` with an
   attributed title does nothing; the paragraph style wins. The redesign bypasses
@@ -131,11 +160,6 @@ final four hours; otherwise it stays the normal pump color near end of life.
   each edit, confirm it on disk (grep) before building.
 - The bolus progress nib is 44pt tall; without the fixed 58pt row height the
   buttons shift 14pt when it appears.
-
-### Finish
-
-Build, run on the iPhone 18 Pro Max, verify every item in the spec, enact a
-small bolus and a suspend to confirm the cards fade without moving the buttons.
-Then push each repo to a new branch `ui-redesign-3.14.9` on the msreyesUS forks,
-point `.gitmodules` at those branches, commit the submodule pointers, and push the
-workspace to `msreyesUS/LoopWorkspace`.
+- Xcode's run destination silently switches back to the phone when it
+  reconnects; check which device a build actually went to before judging a
+  simulator screenshot.
